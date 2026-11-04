@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111318">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="GYM LOG">
+<link rel="manifest" href="manifest.webmanifest">
+<title>GYM LOG — твой прогресс</title>
+<style>
+:root{--bg:#0c0e12;--panel:#151920;--panel2:#1c222b;--line:#29313d;--text:#f3f5f7;--muted:#929cab;--accent:#b7f36b;--accent2:#8fc84a;--red:#ff7c72}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding-bottom:88px}
+button,input,select{font:inherit}button{cursor:pointer}
+header{padding:20px 18px 12px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0c0e12ee;backdrop-filter:blur(14px);z-index:5;border-bottom:1px solid #202630}
+.logo{font-weight:900;letter-spacing:2px;font-size:17px}.logo span{color:var(--accent)}.date{font-size:12px;color:var(--muted)}
+main{max-width:760px;margin:auto;padding:18px}
+h1{font-size:29px;line-height:1.1;margin:8px 0}.sub{color:var(--muted);font-size:14px;margin:7px 0 18px}
+.hero{background:linear-gradient(135deg,#202a1c,#151b17 55%,#171c25);border:1px solid #35452c;border-radius:22px;padding:20px;margin-bottom:18px}
+.hero-top{display:flex;justify-content:space-between;align-items:center}.eyebrow{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase}
+.hero-num{font-size:42px;font-weight:850;letter-spacing:-2px;margin:8px 0 0}.hero small{color:#b6c0ae}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:15px 0 20px}
+.stat{background:var(--panel);border:1px solid var(--line);padding:13px;border-radius:15px}.stat b{display:block;font-size:21px}.stat span{font-size:11px;color:var(--muted)}
+.section-head{display:flex;justify-content:space-between;align-items:center;margin:24px 0 12px}.section-head h2{font-size:18px;margin:0}.muted{color:var(--muted);font-size:12px}
+.primary{background:var(--accent);color:#11170b;border:0;border-radius:13px;padding:12px 16px;font-weight:800}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:10px 13px;font-weight:650}
+.tabs{display:flex;gap:7px;overflow:auto;padding-bottom:4px}.tab{white-space:nowrap;border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:20px;padding:9px 13px;font-size:12px}.tab.active{background:var(--accent);color:#11170b;border-color:var(--accent);font-weight:800}
+.exercise-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.exercise{background:var(--panel);border:1px solid var(--line);border-radius:17px;overflow:hidden;text-align:left;color:var(--text);padding:0}
+.exercise-art{height:125px;background:radial-gradient(ellipse at 50% 80%,#28313c,#171d25 70%);display:flex;align-items:center;justify-content:center}
+.exercise-art svg{height:116px;width:100%}.exercise-info{padding:12px}.exercise-info b{display:block;font-size:13px;line-height:1.25}.exercise-info span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
+.pill{display:inline-block;background:#26311e;color:var(--accent);border-radius:20px;padding:4px 7px;font-size:10px;margin-top:8px}
+.bottom{position:fixed;bottom:0;left:0;right:0;background:#11151bed;backdrop-filter:blur(16px);border-top:1px solid var(--line);display:flex;justify-content:center;z-index:8;padding:9px 10px calc(9px + env(safe-area-inset-bottom))}
+.nav{display:flex;max-width:600px;width:100%;justify-content:space-around}.nav button{background:none;border:0;color:var(--muted);font-size:10px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 13px}.nav button.active{color:var(--accent)}.nav i{font-style:normal;font-size:19px}
+.page{display:none}.page.active{display:block}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:15px;margin:10px 0}
+.row{display:flex;justify-content:space-between;align-items:center;gap:10px}.field{display:flex;flex-direction:column;gap:6px;flex:1}.field label{font-size:11px;color:var(--muted)}input,select{width:100%;background:#0e1218;border:1px solid var(--line);color:var(--text);border-radius:11px;padding:12px;outline:none}input:focus,select:focus{border-color:var(--accent)}
+.exercise-detail-art{height:190px;border-radius:16px;background:radial-gradient(ellipse at 50% 80%,#2b3541,#171d25 70%);display:flex;justify-content:center;align-items:center;margin:12px 0}.exercise-detail-art svg{height:180px;width:100%}
+.back{background:none;border:0;color:var(--accent);padding:5px 0;font-weight:700}
+.log{padding:12px 0;border-bottom:1px solid var(--line)}.log:last-child{border:0}.log b{font-size:15px}.log small{display:block;color:var(--muted);margin-top:4px}
+.empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+canvas{width:100%;height:180px}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#e8f7d7;color:#18210f;padding:11px 16px;border-radius:12px;font-weight:700;font-size:13px;display:none;z-index:20;box-shadow:0 8px 30px #0008}
+@media(min-width:600px){.exercise-list{grid-template-columns:repeat(3,minmax(0,1fr))}.hero{padding:25px}.hero-num{font-size:50px}}
+</style>
+</head>
+<body>
+<header><div class="logo">GYM<span>LOG</span></div><div class="date" id="today"></div></header>
+<main>
+<section id="home" class="page active">
+ <div class="hero"><div class="hero-top"><div class="eyebrow">ТВОЯ СИЛА. ТВОЯ ИСТОРИЯ.</div><span>⚡</span></div><div class="hero-num" id="totalWorkouts">0</div><small>тренировок записано</small><div style="margin-top:16px"><button class="primary" onclick="startWorkout()">＋ Начать тренировку</button></div></div>
+ <div class="stats"><div class="stat"><b id="totalSets">0</b><span>подходов</span></div><div class="stat"><b id="totalVolume">0</b><span>тоннаж, кг</span></div><div class="stat"><b id="exerciseCount">0</b><span>упражнений</span></div></div>
+ <div class="section-head"><h2>Последние записи</h2><button class="secondary" onclick="showPage('history')">Вся история</button></div>
+ <div class="panel" id="recentLogs"><div class="empty">Пока нет записей. Начни первую тренировку!</div></div>
+ <div class="section-head"><h2>Библиотека упражнений</h2><span class="muted">30+ движений</span></div>
+ <div id="homeExercises" class="exercise-list"></div>
+</section>
+<section id="library" class="page">
+ <h1>Упражнения</h1><p class="sub">Выбери движение, чтобы посмотреть технику и историю весов.</p>
+ <div class="tabs" id="filters"></div><div id="libraryExercises" class="exercise-list" style="margin-top:13px"></div>
+</section>
+<section id="workout" class="page">
+ <button class="back" onclick="showPage('home')">← Главная</button>
+ <h1>Тренировка</h1><p class="sub" id="workoutDate"></p>
+ <div class="panel"><div class="row"><b>Добавить упражнение</b><span class="muted" id="sessionCount">0 записей</span></div><select id="workoutSelect" style="margin-top:12px"></select></div>
+ <div id="sessionExercises"></div>
+ <button class="primary" style="width:100%;margin-top:12px" onclick="finishWorkout()">Завершить тренировку</button>
+</section>
+<section id="history" class="page">
+ <h1>История</h1><p class="sub">Все твои подходы и изменения результатов.</p><div id="historyContent"></div>
+</section>
+<section id="progress" class="page">
+ <h1>Прогресс</h1><p class="sub">Следи, как растут рабочие веса.</p>
+ <div class="panel"><div class="field"><label>Упражнение</label><select id="progressSelect" onchange="drawProgress()"></select></div><div style="margin-top:18px"><canvas id="progressChart"></canvas></div><div class="muted" id="progressSummary"></div></div>
+ <div class="panel"><b>Лучшие результаты</b><div id="records"></div></div>
+</section>
+<section id="detail" class="page">
+ <button class="back" onclick="showPage('library')">← К упражнениям</button><div id="detailContent"></div>
+</section>
+</main>
+<div class="bottom"><nav class="nav">
+<button class="active" data-page="home" onclick="showPage('home')"><i>⌂</i>Главная</button>
+<button data-page="library" onclick="showPage('library')"><i>▦</i>Упражнения</button>
+<button data-page="workout" onclick="startWorkout()"><i>＋</i>Тренировка</button>
+<button data-page="history" onclick="showPage('history')"><i>◷</i>История</button>
+<button data-page="progress" onclick="showPage('progress')"><i>↗</i>Прогресс</button>
+</nav></div>
+<div class="toast" id="toast"></div>
+<script>
+const exercises = [
+["Жим штанги лёжа","Грудь","Штанга"],["Жим гантелей лёжа","Грудь","Гантели"],["Жим в тренажёре","Грудь","Тренажёр"],["Сведение рук в кроссовере","Грудь","Блок"],["Разводка гантелей лёжа","Грудь","Гантели"],["Отжимания на брусьях","Грудь","Свой вес"],
+["Тяга верхнего блока","Спина","Блок"],["Тяга горизонтального блока","Спина","Блок"],["Тяга штанги в наклоне","Спина","Штанга"],["Тяга гантели одной рукой","Спина","Гантели"],["Подтягивания","Спина","Свой вес"],["Гиперэкстензия","Спина","Свой вес"],
+["Жим штанги стоя","Плечи","Штанга"],["Жим гантелей сидя","Плечи","Гантели"],["Махи гантелями в стороны","Плечи","Гантели"],["Обратная бабочка","Плечи","Тренажёр"],["Тяга каната к лицу","Плечи","Блок"],
+["Подъём штанги на бицепс","Бицепс","Штанга"],["Сгибание рук с гантелями","Бицепс","Гантели"],["Молотки","Бицепс","Гантели"],["Разгибание рук на блоке","Трицепс","Блок"],["Французский жим","Трицепс","Штанга"],["Разгибание руки из-за головы","Трицепс","Гантели"],
+["Приседания со штангой","Ноги","Штанга"],["Жим ногами","Ноги","Тренажёр"],["Разгибание ног","Ноги","Тренажёр"],["Сгибание ног лёжа","Ноги","Тренажёр"],["Румынская тяга","Ноги","Штанга"],["Подъём на носки","Икры","Тренажёр"],["Скручивания","Пресс","Свой вес"],["Планка","Пресс","Свой вес"]
+].map((x,i)=>({id:i,name:x[0],group:x[1],type:x[2]}));
+const groups=["Все","Грудь","Спина","Плечи","Бицепс","Трицепс","Ноги","Икры","Пресс"];
+let logs=JSON.parse(localStorage.getItem("gymlog_logs")||"[]");
+let session=[],filter="Все";
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem("gymlog_logs",JSON.stringify(logs))}
+function dateStr(d=new Date()){return d.toLocaleDateString("ru-RU",{day:"numeric",month:"long",year:"numeric"})}
+$("today").textContent=dateStr();
+function muscleSVG(group){
+ let color="#b7f36b";
+ let marks={Грудь:'<path d="M75 55 Q100 42 125 55 L119 76 Q100 67 81 76Z"/>',Спина:'<path d="M82 51 Q100 45 118 51 L115 94 Q100 104 85 94Z"/>',Плечи:'<circle cx="76" cy="56" r="12"/><circle cx="124" cy="56" r="12"/>',Бицепс:'<ellipse cx="74" cy="78" rx="8" ry="15"/><ellipse cx="126" cy="78" rx="8" ry="15"/>',Трицепс:'<ellipse cx="75" cy="80" rx="8" ry="15"/><ellipse cx="125" cy="80" rx="8" ry="15"/>',Ноги:'<path d="M84 112 L98 112 L94 159 L82 159Z M102 112 L116 112 L118 159 L106 159Z"/>',Икры:'<path d="M84 143 L96 143 L93 168 L82 168Z M104 143 L116 143 L119 168 L107 168Z"/>',Пресс:'<rect x="88" y="75" width="24" height="34" rx="7"/>'};
+ return `<svg viewBox="0 0 200 180" role="img" aria-label="Иллюстрация работающих мышц: ${group}"><g fill="#8793a2" stroke="#b3bdc9" stroke-width="1.5" stroke-linejoin="round"><circle cx="100" cy="25" r="13"/><path d="M86 42 Q100 36 114 42 L121 94 L111 113 L89 113 L79 94Z"/><path d="M82 47 L65 54 L52 91 L60 95 L78 70 M118 47 L135 54 L148 91 L140 95 L122 70" fill="none" stroke-width="9" stroke-linecap="round"/><path d="M90 110 L82 161 L92 164 L101 119 L108 164 L118 161 L110 110Z"/></g><g fill="${color}" opacity=".95">${marks[group]||marks.Грудь}</g><g fill="none" stroke="#dce4ec" stroke-width="2" stroke-linecap="round"><path d="M56 96 L51 108 M144 96 L149 108"/></g></svg>`;
+}
+function card(e){let count=logs.filter(l=>l.id===e.id).length;return `<button class="exercise" onclick="openDetail(${e.id})"><div class="exercise-art">${muscleSVG(e.group)}</div><div class="exercise-info"><b>${e.name}</b><span>${e.group} · ${e.type}</span>${count?`<i class="pill">${count} записей</i>`:""}</div></button>`}
+function renderLibrary(){
+ $("homeExercises").innerHTML=exercises.slice(0,4).map(card).join("");
+ $("filters").innerHTML=groups.map(g=>`<button class="tab ${g===filter?"active":""}" onclick="setFilter('${g}')">${g}</button>`).join("");
+ $("libraryExercises").innerHTML=exercises.filter(e=>filter==="Все"||e.group===filter).map(card).join("");
+}
+function setFilter(g){filter=g;renderLibrary()}
+function showPage(id){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));$(id).classList.add("active");
+ document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active",b.dataset.page===id));
+ if(id==="home")renderHome();if(id==="history")renderHistory();if(id==="progress"){fillProgress();drawProgress()}
+ if(id==="library")renderLibrary();
+}
+function previous(id){let arr=logs.filter(l=>l.id===id);return arr.length?arr[arr.length-1]:null}
+function openDetail(id){
+ let e=exercises[id],arr=logs.filter(l=>l.id===id).slice().reverse(),best=arr.reduce((m,l)=>Math.max(m,l.weight),0);
+ $("detailContent").innerHTML=`<div class="eyebrow">${e.group.toUpperCase()}</div><h1>${e.name}</h1><div class="exercise-detail-art">${muscleSVG(e.group)}</div><div class="row"><div><div class="muted">Лучший вес</div><h1>${best?best+" кг":"—"}</h1></div><div><div class="muted">Записей</div><h1>${arr.length}</h1></div></div><div class="panel"><b>История упражнения</b>${arr.length?arr.map(l=>`<div class="log"><div class="row"><b>${l.weight} кг × ${l.reps}</b><span class="muted">${l.date}</span></div><small>${l.sets||1} подход(а)${l.note?" · "+l.note:""}</small></div>`).join(""):'<div class="empty">Пока нет результатов. Добавь упражнение в тренировку.</div>'}</div><button class="primary" style="width:100%" onclick="startWorkout(${id})">＋ Записать результат</button>`;
+ showPage("detail");
+}
+function startWorkout(id=null){
+ if(!session.length)$("workoutDate").textContent=dateStr();
+ if(id!==null)addExercise(id);
+ $("workoutSelect").innerHTML='<option value="">Выбери упражнение…</option>'+exercises.map(e=>`<option value="${e.id}">${e.name} · ${e.group}</option>`).join("");
+ $("workoutSelect").onchange=ev=>{if(ev.target.value!==""){addExercise(+ev.target.value);ev.target.value=""}};
+ showPage("workout");renderSession();
+}
+function addExercise(id){
+ if(session.some(x=>x.id===id)){toast("Упражнение уже добавлено");return}
+ let p=previous(id);session.push({id,weight:p?p.weight:"",reps:p?p.reps:"",sets:3,note:""});
+}
+function renderSession(){
+ $("sessionCount").textContent=session.length+" упражн.";
+ $("sessionExercises").innerHTML=session.length?session.map((s,i)=>{let e=exercises[s.id],p=previous(s.id);return `<div class="panel"><div class="row"><b>${e.name}</b><button class="back" onclick="session.splice(${i},1);renderSession()">Убрать</button></div>${p?`<div class="muted" style="margin:7px 0">Прошлый раз: ${p.weight} кг × ${p.reps} · ${p.date}</div>`:'<div class="muted" style="margin:7px 0">Первый результат в этом упражнении</div>'}<div class="row" style="margin-top:12px"><div class="field"><label>Вес, кг</label><input type="number" min="0" step="0.5" value="${s.weight}" placeholder="Напр. 70" onchange="session[${i}].weight=this.value"></div><div class="field"><label>Повторения</label><input type="number" min="1" value="${s.reps}" placeholder="12" onchange="session[${i}].reps=this.value"></div><div class="field"><label>Подходы</label><input type="number" min="1" value="${s.sets}" onchange="session[${i}].sets=this.value"></div></div></div>`}).join(""):'<div class="empty">Выбери упражнение выше, чтобы добавить его в тренировку.</div>';
+}
+function finishWorkout(){
+ let valid=session.filter(s=>s.weight!==""&&s.reps!==""&&+s.weight>=0&&+s.reps>0);
+ if(!valid.length){toast("Добавь хотя бы один результат");return}
+ let date=dateStr();valid.forEach(s=>logs.push({id:s.id,weight:+s.weight,reps:+s.reps,sets:+s.sets||1,date,ts:Date.now(),note:s.note||""}));
+ save();session=[];toast("Тренировка сохранена 💪");showPage("home");
+}
+function renderHome(){
+ $("totalWorkouts").textContent=new Set(logs.map(l=>l.date)).size;
+ $("totalSets").textContent=logs.reduce((a,l)=>a+(l.sets||1),0);
+ $("totalVolume").textContent=Math.round(logs.reduce((a,l)=>a+l.weight*l.reps*(l.sets||1),0)).toLocaleString("ru-RU");
+ $("exerciseCount").textContent=new Set(logs.map(l=>l.id)).size;
+ let recent=logs.slice().reverse().slice(0,4);
+ $("recentLogs").innerHTML=recent.length?recent.map(l=>`<div class="log"><div class="row"><b>${exercises[l.id].name}</b><b>${l.weight} кг × ${l.reps}</b></div><small>${l.date} · ${l.sets} подход(а)</small></div>`).join(""):'<div class="empty">Пока нет записей. Начни первую тренировку!</div>';
+ renderLibrary();
+}
+function renderHistory(){
+ $("historyContent").innerHTML=logs.length?logs.slice().reverse().map(l=>`<div class="panel"><div class="row"><b>${exercises[l.id].name}</b><span class="muted">${l.date}</span></div><h2 style="margin:8px 0">${l.weight} кг × ${l.reps}</h2><div class="muted">${l.sets} подход(а)</div></div>`).join(""):'<div class="panel empty">История пока пуста.</div>';
+}
+function fillProgress(){
+ $("progressSelect").innerHTML=exercises.map(e=>`<option value="${e.id}">${e.name}</option>`).join("");
+}
+function drawProgress(){
+ let id=+$("progressSelect").value||0,arr=logs.filter(l=>l.id===id),c=$("progressChart"),ctx=c.getContext("2d");
+ let w=c.clientWidth||300,h=180,dpr=window.devicePixelRatio||1;c.width=w*dpr;c.height=h*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,h);
+ if(!arr.length){ctx.fillStyle="#929cab";ctx.font="13px sans-serif";ctx.fillText("Добавь результаты — здесь появится график",8,85);$("progressSummary").textContent="Пока нет данных по этому упражнению.";return}
+ let vals=arr.map(l=>l.weight),min=Math.min(...vals)*.9,max=Math.max(...vals)*1.1;if(min===max)max=min+10;
+ ctx.strokeStyle="#303a47";ctx.lineWidth=1;for(let i=0;i<4;i++){let y=15+i*45;ctx.beginPath();ctx.moveTo(8,y);ctx.lineTo(w-8,y);ctx.stroke()}
+ ctx.strokeStyle="#b7f36b";ctx.lineWidth=3;ctx.beginPath();arr.forEach((l,i)=>{let x=12+(w-24)*(arr.length===1?0:i/(arr.length-1)),y=150-(l.weight-min)/(max-min)*125;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+ arr.forEach((l,i)=>{let x=12+(w-24)*(arr.length===1?0:i/(arr.length-1)),y=150-(l.weight-min)/(max-min)*125;ctx.fillStyle="#b7f36b";ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fill()});
+ $("progressSummary").textContent=`Последний результат: ${arr[arr.length-1].weight} кг × ${arr[arr.length-1].reps}. Лучший вес: ${Math.max(...vals)} кг.`;
+ $("records").innerHTML=exercises.filter(e=>logs.some(l=>l.id===e.id)).map(e=>{let best=Math.max(...logs.filter(l=>l.id===e.id).map(l=>l.weight));return `<div class="log row"><span>${e.name}</span><b>${best} кг</b></div>`}).join("")||'<div class="empty">Пока нет рекордов.</div>';
+}
+function toast(t){$("toast").textContent=t;$("toast").style.display="block";setTimeout(()=>$("toast").style.display="none",2200)}
+renderHome();renderLibrary();
+if("serviceWorker" in navigator && location.protocol!=="file:"){navigator.serviceWorker.register("./sw.js").catch(()=>{});}
+</script>
+</body></html>
